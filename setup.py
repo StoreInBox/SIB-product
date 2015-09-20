@@ -16,7 +16,7 @@ setup(
     version='0.1.0',
     author='zymud',
     author_email='zymud@i.ua',
-    url='https://github.com/StoreInBox/SIB-product',
+    url='https://github.com/StoreInBox/sib-products',
     description='Part of SIB project',
     long_description=open('README.rst').read(),
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
