@@ -55,7 +55,7 @@ class Category(models.Model):
     slug = models.SlugField(
         _('Slug'), max_length=255,
         help_text=_('This field will be shown in URL address (for SEO). It will be filled automatically.'))
-    parent = models.ForeignKey('Category', null=True, related_name='children')
+    parent = models.ForeignKey('Category', related_name='children', null=True)
     characteristics = models.ManyToManyField(
         Characteristic, related_name='categories', through=CategoryCharacteristicLink)
 
