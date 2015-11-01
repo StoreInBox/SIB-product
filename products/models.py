@@ -2,16 +2,17 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFit
 from model_utils import FieldTracker
 from model_utils.models import TimeStampedModel
 from unidecode import unidecode
 
-# XXX: get_url methods need to be refactored or covered in documentation
+from . import settings
 
 
 @python_2_unicode_compatible
@@ -141,6 +142,9 @@ class Product(TimeStampedModel):
     def __str__(self):
         return '{}'.format(self.name)
 
+    def get_main_image(self):
+        return self.images.filter(is_main=True).first()
+
     def _get_all_attributes(self):
         """ Get list of attributes that product already have and attributes that was predefined by user """
         return list(self.attributes.all()) + list(getattr(self, 'predefined_attributes', []))
@@ -206,3 +210,32 @@ class ProductAttribute(models.Model):
         except ValueError:
             pass
         return super(ProductAttribute, self).save(*args, **kwargs)
+
+
+@python_2_unicode_compatible
+class ProductImage(models.Model):
+    class Meta:
+        verbose_name = _('Product image')
+        verbose_name_plural = _('Product images')
+
+    product = models.ForeignKey(Product, related_name='images')
+    image = models.ImageField(upload_to='products/', verbose_name=_('Image'))
+    image_small_thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFit(width=settings.SMALL_THUMBNAIL_WIDTH, height=settings.SMALL_THUMBNAIL_HEIGHT,
+                                upscale=True, mat_color='white')],
+        format='JPEG',
+        options={'quality': 100})
+    image_big_thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFit(width=settings.BIG_THUMBNAIL_WIDTH, height=settings.BIG_THUMBNAIL_HEIGHT,
+                                upscale=True, mat_color='white')],
+        format='JPEG',
+        options={'quality': 100})
+    description = models.CharField(_('Image description'), max_length=127, blank=True)
+    is_main = models.BooleanField(
+        default=True,
+        help_text=_('If image is main - it will be displayed on product list page'))
+
+    def __str__(self):
+        return 'Image for product {} ({})'.format(self.product.name, self.description)

@@ -9,6 +9,9 @@ tests_requires = []
 
 install_requires = [
     'Django>=1.7,<1.9',
+    'django-imagekit==3.2.6',
+    'django-model-utils==2.3.1',
+    'Pillow==2.7.0',
 ]
 
 setup(
