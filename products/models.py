@@ -57,6 +57,7 @@ class Category(models.Model):
         _('Slug'), max_length=255,
         help_text=_('This field will be shown in URL address (for SEO). It will be filled automatically.'))
     parent = models.ForeignKey('Category', related_name='children', null=True)
+    image = models.ImageField(upload_to='categories/', verbose_name=_('Category'))
     characteristics = models.ManyToManyField(
         Characteristic, related_name='categories', through=CategoryCharacteristicLink)
 
