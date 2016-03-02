@@ -11,6 +11,9 @@ install_requires = [
     'Django>=1.7,<1.9',
     'django-imagekit==3.2.6',
     'django-model-utils==2.3.1',
+    'djangorestframework==3.2.5',
+    'django_filter==0.12.0',
+    'django_taggit==0.18.0',
     'Pillow==2.7.0',
 ]
 

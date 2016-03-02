@@ -19,7 +19,7 @@ from . import settings
 class Characteristic(models.Model):
     """ Abstract product attribute.
 
-    Characteristic can be connected to category. All products that are
+    Characteristic is connected to category. All products that are
     connected to category with characteristic must have attribute that
     defines concrete value of given characteristic.
     """
@@ -27,22 +27,11 @@ class Characteristic(models.Model):
         verbose_name = _('Characteristic')
         verbose_name_plural = _('Characteristics')
 
-    name = models.CharField(_('Name'), max_length=255, unique=True)
-    description = models.TextField(_('Description'), blank=True)
-    default_value = models.CharField(_('Default value'), max_length=127, blank=True)
-    units = models.CharField(_('Units'), max_length=50, blank=True)
+    category = models.ForeignKey('Category', related_name='characteristics')
+    name = models.CharField(_('Name'), max_length=255)
 
     def __str__(self):
-        return '{}'.format(self.name)
-
-
-@python_2_unicode_compatible
-class CategoryCharacteristicLink(models.Model):
-    category = models.ForeignKey('Category')
-    characteristic = models.ForeignKey('Characteristic')
-
-    def __str__(self):
-        return 'link between {} category and {} characteristic'.format(self.category, self.characteristic)
+        return 'Characteristic %s for category %s' % (self.name, self.category)
 
 
 @python_2_unicode_compatible
@@ -51,15 +40,15 @@ class Category(models.Model):
     class Meta:
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
+        ordering = ['order_number']
 
     name = models.CharField(_('Name'), max_length=255)
     slug = models.SlugField(
         _('Slug'), max_length=255,
         help_text=_('This field will be shown in URL address (for SEO). It will be filled automatically.'))
     parent = models.ForeignKey('Category', related_name='children', null=True)
-    image = models.ImageField(upload_to='categories/', verbose_name=_('Category'))
-    characteristics = models.ManyToManyField(
-        Characteristic, related_name='categories', through=CategoryCharacteristicLink)
+    image = models.ImageField(upload_to='categories/', verbose_name=_('Category'), null=True)
+    order_number = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return '{}'.format(self.name)
@@ -183,7 +172,6 @@ class ProductAttribute(models.Model):
     value_float = models.FloatField(
         _('Attribute value as number'), null=True,
         help_text=_('This field will be defined automatically'))
-    units = models.CharField(_('Units'), max_length=50, blank=True)
 
     def __str__(self):
         return '{}'.format(self.name)

@@ -11,10 +11,17 @@ class ProductsConfig(AppConfig):
     def ready(self):
         from . import handlers
 
-        CategoryCharacteristicLink = self.get_model('CategoryCharacteristicLink')
+        Category = self.get_model('Category')
+        Characteristic = self.get_model('Characteristic')
 
         signals.post_save.connect(
-            handlers.add_attributes_to_products_on_characteristics_connection_to_category,
-            sender=CategoryCharacteristicLink,
-            dispatch_uid='products.handlers.add_attributes_to_products_on_characteristics_connection_to_category',
+            handlers.add_attributes_to_products_on_characteristics_creation,
+            sender=Characteristic,
+            dispatch_uid='products.handlers.add_attributes_to_products_on_characteristics_creation',
+        )
+
+        signals.post_save.connect(
+            handlers.init_new_category_order_number,
+            sender=Category,
+            dispatch_uid='products.handlers.init_new_category_order_number',
         )

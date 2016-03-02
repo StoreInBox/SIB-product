@@ -5,7 +5,7 @@ from . import models
 
 
 class CharacteristicAdmin(admin.ModelAdmin):
-    list_display = ['name', 'default_value', 'units']
+    list_display = ['name', 'category']
     model = models.Characteristic
 
 
