@@ -10,7 +10,8 @@ class CharacteristicSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    parent = serializers.PrimaryKeyRelatedField(queryset=models.Category.objects.all(), allow_null=True)
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=models.Category.objects.all(), allow_null=True, required=False)
     characteristics = CharacteristicSerializer(many=True)
 
     class Meta(object):
@@ -27,12 +28,10 @@ class CategorySerializer(serializers.ModelSerializer):
         return category
 
     def update(self, instance, validated_data):
-        print validated_data
         new_characteristics = validated_data.pop('characteristics', None)
         category = super(CategorySerializer, self).update(instance, validated_data)
         if new_characteristics is None:
             return category
-        print new_characteristics
         new_characteristics_names = [c['name'] for c in new_characteristics]
         category.characteristics.exclude(name__in=new_characteristics_names).delete()
         for name in new_characteristics_names:
